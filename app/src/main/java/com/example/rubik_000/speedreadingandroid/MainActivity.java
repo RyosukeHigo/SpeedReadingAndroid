@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
     EditText editText;
     TextView rate;
     int stime = 300;
-
+    boolean flag = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,6 +70,11 @@ public class MainActivity extends AppCompatActivity {
                         final ArrayList<String> TextList = YahooAPI();
                         //final String result = getMessage(); // 何かの処理
                         for (int i = 0; i < TextList.size(); i++) {
+                            while(true){
+                                if(!flag){
+                                    break;
+                                }
+                            }
                             final int k = i;
                             //for(final String s:TextList){
                             handler.post(new Runnable() {
@@ -108,6 +113,13 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 stime -= 50;
+            }
+        });
+        Button stop = (Button)findViewById(R.id.stop);
+        stop.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                flag = !flag;
             }
         });
         // ATTENTION: This was auto-generated to implement the App Indexing API.

@@ -84,4 +84,13 @@
         android:maxHeight="300dp"
         tools:width="400dp" />
 
+    <Button
+        android:text="||"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/stop"
+        android:layout_alignParentBottom="true"
+        android:layout_toLeftOf="@+id/button"
+        android:layout_toStartOf="@+id/button" />
+
 </RelativeLayout>
