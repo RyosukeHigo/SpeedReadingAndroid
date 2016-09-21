@@ -15,7 +15,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/textView3"
-        android:textSize="18sp"
+        android:textSize="12sp"
         android:layout_marginTop="50dp"
         android:layout_centerHorizontal="true" />
 
@@ -23,10 +23,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Hello World!"
-        android:textSize="18sp"
+        android:textSize="12sp"
         android:layout_alignParentTop="false"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="15dp"
         android:id="@+id/textView1" />
 
     <TextView
@@ -35,27 +35,53 @@
         android:layout_height="wrap_content"
         android:id="@+id/textView2"
         android:textSize="18sp"
-        android:layout_alignLeft="@+id/textView3"
-        android:layout_alignStart="@+id/textView3"
-        android:layout_marginTop="30dp" />
+        android:layout_marginTop="30dp"
+        android:layout_centerHorizontal="true" />
 
     <Button
-        android:text="Button"
+        android:text="START"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:id="@+id/button" />
 
+    <Button
+        android:text="Faster"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/button"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:id="@+id/faster" />
+
+    <Button
+        android:text="SLOWER"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/button"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:id="@+id/slower" />
+
+    <TextView
+        android:text="TextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/button"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="12dp"
+        android:id="@+id/rate" />
+
     <EditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:inputType="textPersonName"
-        android:text="Name"
+        android:inputType="textMultiLine"
         android:ems="10"
-        android:layout_below="@+id/textView3"
+        android:id="@+id/editText"
+        android:layout_marginTop="127dp"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="82dp"
-        android:id="@+id/editText" />
+        android:maxHeight="300dp"
+        tools:width="400dp" />
 
 </RelativeLayout>

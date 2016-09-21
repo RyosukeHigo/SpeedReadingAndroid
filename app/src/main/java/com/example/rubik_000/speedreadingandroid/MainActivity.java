@@ -30,7 +30,9 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 
 import org.xmlpull.v1.XmlPullParser;
+
 import android.util.Xml;
+
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
 
@@ -45,15 +47,18 @@ public class MainActivity extends AppCompatActivity {
     TextView textView2;
     TextView textView3;
     EditText editText;
+    TextView rate;
+    int stime = 300;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        textView1 = (TextView)findViewById(R.id.textView1);
-        textView2 = (TextView)findViewById(R.id.textView2);
-        textView3 = (TextView)findViewById(R.id.textView3);
-        editText = (EditText)findViewById(R.id.editText);
-        final Handler handler= new Handler();
+        textView1 = (TextView) findViewById(R.id.textView1);
+        textView2 = (TextView) findViewById(R.id.textView2);
+        textView3 = (TextView) findViewById(R.id.textView3);
+        editText = (EditText) findViewById(R.id.editText);
+        final Handler handler = new Handler();
         Button button = (Button) findViewById(R.id.button);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -64,19 +69,23 @@ public class MainActivity extends AppCompatActivity {
                         // マルチスレッドにしたい処理 ここから
                         final ArrayList<String> TextList = YahooAPI();
                         //final String result = getMessage(); // 何かの処理
-                        for(final String s:TextList){
-                        handler.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                    textView1.setText(s); // 画面に描画する処理
+                        for (int i = 0; i < TextList.size(); i++) {
+                            final int k = i;
+                            //for(final String s:TextList){
+                            handler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if(k-1>=0) textView1.setText(TextList.get(k-1)); // 画面に描画する処理
+                                    textView2.setText(TextList.get(k));
+                                    if(k+1<TextList.size()) textView3.setText(TextList.get(k+1));
+                                }
+                            });
+                            try {
+                                Thread.sleep(stime);
+                            } catch (Exception ex) {
+                                System.out.println(ex);
                             }
-                        });
-                        try {
-                            Thread.sleep(500);
-                        }catch (Exception ex){
-                            System.out.println(ex);
                         }
-                    }
 
                         // マルチスレッドにしたい処理 ここまで
                     }
@@ -85,69 +94,83 @@ public class MainActivity extends AppCompatActivity {
 
 
         });
+        rate = (TextView) findViewById(R.id.rate);
+        rate.setText(String.valueOf(stime));
+        Button slower = (Button) findViewById(R.id.slower);
+        slower.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                stime += 50;
+            }
+        });
+        Button faster = (Button) findViewById(R.id.faster);
+        faster.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                stime -= 50;
+            }
+        });
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
     }
-    public ArrayList<String> YahooAPI(){
+
+    public ArrayList<String> YahooAPI() {
         //Log.d("OK","OKOKOKOKO");
         ArrayList<String> result = new ArrayList<String>();
         final String BASE_URI = "http://jlp.yahooapis.jp/DAService/V1/parse";
         final String APP_ID = "dj0zaiZpPXY3U0syYkg4eXR5cSZzPWNvbnN1bWVyc2VjcmV0Jng9MDg-";
-        String text = editText.getText().toString().replaceAll("\n","");
+        String text = editText.getText().toString().replaceAll("\n", "");
         try {
             text = URLEncoder.encode(text, "UTF-8");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
         try {
-            URL url = new URL(BASE_URI+"?appid="+APP_ID+"&sentence="+text);
+            URL url = new URL(BASE_URI + "?appid=" + APP_ID + "&sentence=" + text);
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
-            //String str = InputStreamToString(con.getInputStream());
-//            XmlPullParser xmlPullParser = Xml.newPullParser();
-//            xmlPullParser.setInput(con.getInputStream(), "UTF-8");
-            //Log.d("TEST",str);
             XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
             factory.setNamespaceAware(true);
             XmlPullParser xmlPullParser = factory.newPullParser();
-            xmlPullParser.setInput(con.getInputStream(),"UTF-8");
+            xmlPullParser.setInput(con.getInputStream(), "UTF-8");
             int eventType = xmlPullParser.getEventType();
             boolean isChunk = false;
             boolean isSurface = false;
             String tmp = "";
             while (eventType != XmlPullParser.END_DOCUMENT) {
-                if(eventType == XmlPullParser.START_DOCUMENT) {
+                if (eventType == XmlPullParser.START_DOCUMENT) {
                     System.out.println("Start document");
-                } else if(eventType == XmlPullParser.START_TAG) {
-                    if(xmlPullParser.getName().equals("Chunk")){
+                } else if (eventType == XmlPullParser.START_TAG) {
+                    if (xmlPullParser.getName().equals("Chunk")) {
                         isChunk = true;
-                    }else if(xmlPullParser.getName().equals("Surface")){
+                    } else if (xmlPullParser.getName().equals("Surface")) {
                         isSurface = true;
                     }
-                    System.out.println("Start tag "+xmlPullParser.getName());
-                } else if(eventType == XmlPullParser.END_TAG) {
-                    if(xmlPullParser.getName().equals("Chunk")){
+                    System.out.println("Start tag " + xmlPullParser.getName());
+                } else if (eventType == XmlPullParser.END_TAG) {
+                    if (xmlPullParser.getName().equals("Chunk")) {
                         isChunk = false;
                         result.add(tmp);
                         tmp = "";
-                    }else if(xmlPullParser.getName().equals("Surface")){
+                    } else if (xmlPullParser.getName().equals("Surface")) {
                         isSurface = false;
                     }
-                    System.out.println("End tag "+xmlPullParser.getName());
-                } else if(eventType == XmlPullParser.TEXT) {
-                    if(isChunk&&isSurface){
+                    System.out.println("End tag " + xmlPullParser.getName());
+                } else if (eventType == XmlPullParser.TEXT) {
+                    if (isChunk && isSurface) {
                         tmp = tmp + xmlPullParser.getText();
                     }
-                    System.out.println("Text "+xmlPullParser.getText());
+                    System.out.println("Text " + xmlPullParser.getText());
                 }
                 eventType = xmlPullParser.next();//increment
             }
-        }catch (Exception ex) {
+        } catch (Exception ex) {
             System.out.println(ex);
         }
-
-       return result;
+        result.add("");
+        return result;
     }
+
     static String InputStreamToString(InputStream is) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(is));
         StringBuilder sb = new StringBuilder();
@@ -158,6 +181,7 @@ public class MainActivity extends AppCompatActivity {
         br.close();
         return sb.toString();
     }
+
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
      * See https://g.co/AppIndexing/AndroidStudio for more information.
