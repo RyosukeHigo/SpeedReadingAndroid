@@ -1,5 +1,10 @@
 package com.example.rubik_000.speedreadingandroid;
 
+import android.content.Context;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.net.Uri;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
@@ -28,6 +33,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.xmlpull.v1.XmlPullParser;
 
@@ -36,7 +42,7 @@ import android.util.Xml;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements SensorEventListener {
 
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
@@ -50,6 +56,8 @@ public class MainActivity extends AppCompatActivity {
     TextView rate;
     int stime = 300;
     boolean flag = false;
+    private SensorManager mSensorManager;
+    TextView textView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -106,6 +114,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 stime += 50;
+                rate.setText(String.valueOf(stime));
             }
         });
         Button faster = (Button) findViewById(R.id.faster);
@@ -113,6 +122,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 stime -= 50;
+                rate.setText(String.valueOf(stime));
             }
         });
         Button stop = (Button)findViewById(R.id.stop);
@@ -122,6 +132,8 @@ public class MainActivity extends AppCompatActivity {
                 flag = !flag;
             }
         });
+        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        textView = (TextView)findViewById(R.id.textView);
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
@@ -193,7 +205,43 @@ public class MainActivity extends AppCompatActivity {
         br.close();
         return sb.toString();
     }
+    @Override
+    protected void onResume() {
+        super.onResume();
 
+        // 照度センサーを指定してオブジェクトリストを取得する
+        List<Sensor> sensors = mSensorManager.getSensorList(Sensor.TYPE_LIGHT);
+
+        // 照度センサーがサポートされているか確認してから登録する
+        if (sensors.size() > 0) {
+            Sensor s = sensors.get(0);
+            mSensorManager.registerListener(this, s, SensorManager.SENSOR_DELAY_UI);
+        }
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+        // onAccuracyChangedは今回は未使用
+    }
+
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+        switch(event.sensor.getType()){
+            case Sensor.TYPE_LIGHT:
+                // 現在の明るさを取得
+                int light_value = (int)(event.values[0]);
+
+                // 明るさが200未満のときのセリフ
+                if (light_value < 200) {
+                    textView.setText("暗い");
+
+                    // 明るさが200以上のときのセリフ
+                } else {
+                    textView.setText("明るい");
+                }
+                break;
+        }
+    }
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
      * See https://g.co/AppIndexing/AndroidStudio for more information.
